@@ -1,42 +1,29 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <err.h>
 
 #include "util.h"
 
-#define BUFF_SIZE 256;
+#include "client.h"
+#include "server.h"
 
-int client();
-int server();
+#define BUF_SIZE 256;
+
+
 
 int main() {
-	char command[BUFF_SIZE];
+	char command[BUF_SIZE];
 	
 	printf("Client or server? (c/s)\n");
-
-}
-
-
-int client() {
-	char command[BUFF_SIZE];
-	char exit_flag = 0;
-	int count, i;
-	int file;
-
-	int argc = 0;
-	char *argv[MAX_ARGS];
-
-	printf("Starting client\n");
-
-	while(!exit_flag) {
-		print_prompt();
-
-		if((count = _getline(command, BUFF_SIZE)) == -1) { //getline
-			printf("Command too long, cannot be more than %d chars\n", BUFF_SIZE);
-		} else {
-
-		}
-	}
-
-	return 0;
+        if(_getline(command, BUF_SIZE) == -1)
+                errx(-1, "input too long");
+        
+        if(!strcmp(command, "c")) {
+                start_client();
+        } else if(!strcmp(command, "s")) {
+                start_server();
+        } else {
+                errx(0, "put c or s");
+        }
 }
