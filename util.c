@@ -42,13 +42,3 @@ void print_prompt() {
 	printf("%s>", prompt);
 	fflush(stdout);
 }
-
-void print_help() {
-	printf("Type 'help' for help\n");
-	printf("Type 'cd' to change directory\n");
-	printf("Any other commands will be run from /bin/\n");
-
-	printf("This shell handles >, 2>, &>, >>, 2>>, &>>,");
-	printf(" and <, as well as pipes and semicolons\n");
-}
-

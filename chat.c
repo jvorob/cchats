@@ -13,12 +13,12 @@
 
 
 int main() {
-	char command[BUF_SIZE];
-	
-	printf("Client or server? (c/s)\n");
+        char command[BUF_SIZE];
+
+        printf("Client or server? (c/s)\n");
         if(_getline(command, BUF_SIZE) == -1)
                 errx(-1, "input too long");
-        
+
         if(!strcmp(command, "c")) {
                 start_client();
         } else if(!strcmp(command, "s")) {
