@@ -20,9 +20,9 @@ int main() {
                 errx(-1, "input too long");
 
         if(!strcmp(command, "c")) {
-                start_client();
+                return start_client();
         } else if(!strcmp(command, "s")) {
-                start_server();
+                return start_server();
         } else {
                 errx(0, "put c or s");
         }
