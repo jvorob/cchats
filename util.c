@@ -13,17 +13,17 @@ static char prompt[PROMPT_SIZE];
 
 int _getline(char *in, int bytestoread) {
 	int count;
-	count = read(STDIN_FD, in, bytestoread);
+	count = read(STDIN_FILENO, in, bytestoread);
 	
 	if(count == -1){
-		printf("%d\n", STDIN_FD);
+		printf("%d\n", STDIN_FILENO);
 		err(-1, "_getline failed");
 	}
 	else if(count == 0) 
 		errx(-1, "stdin read 0");
 	else if(in[count - 1] != '\n') {
 		do {
-			count = read(STDIN_FD, in, bytestoread);
+			count = read(STDIN_FILENO, in, bytestoread);
 			if(count == -1)
 				errx(-1, "Error after buffer overflow");	
 		} while (in[count - 1] != '\n');

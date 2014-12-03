@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #include "util.h"
+#include "client.h"
 
 int start_client() {
         printf("Starting client\n");

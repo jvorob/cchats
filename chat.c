@@ -8,7 +8,7 @@
 #include "client.h"
 #include "server.h"
 
-#define BUF_SIZE 256;
+#define BUF_SIZE 256
 
 
 
