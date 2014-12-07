@@ -1,41 +1,101 @@
+#include <arpa/inet.h>
 #include <netdb.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>
+#include <unistd.h>
 
 #include "util.h"
 #include "client.h"
 
+// get sockaddr, IPv4 or IPv6:
+void *get_in_addr(struct sockaddr *sa) {
+        if (sa->sa_family == AF_INET) {
+                return &(((struct sockaddr_in*)sa)->sin_addr);
+        }
+
+        return &(((struct sockaddr_in6*)sa)->sin6_addr);
+}
+
 int start_client() {
-        const int PORT = 10000;
-        char *port_string;
-        sprintf(port_string, "%d", PORT);
+        const char *PORT = "10000";
 
         printf("Starting client\n");
 
-        // Open connection to server here
-        struct addrinfo hints, *res, *res0;
+        struct addrinfo hints, *servinfo;
         hints.ai_family = PF_UNSPEC;
         hints.ai_socktype = SOCK_STREAM;
         memset(&hints, 0, sizeof(hints));
 
-        int error = getaddrinfo("107.170.106.89", port_string, &hints, &res0);
+        // Open connection to server here
+        int rv = getaddrinfo("107.170.106.89", PORT, &hints, &servinfo);
+        if (rv != 0) {
+                fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
+                return 1;
+        }
+
+        // loop through all the results and connect to the first we can
+        struct addrinfo *p;
+        int sockfd;
+        for(p = servinfo; p != NULL; p = p->ai_next) {
+                sockfd = socket(p->ai_family, p->ai_socktype, p->ai_protocol);
+                if (sockfd == -1) {
+                        perror("client: socket");
+                        continue;
+                }
+
+                if (connect(sockfd, p->ai_addr, p->ai_addrlen) == -1) {
+                        close(sockfd);
+                        perror("client: connect");
+                        continue;
+                }
+
+                break;
+        }
+
+        if (p == NULL) {
+                fprintf(stderr, "client: failed to connect\n");
+                return 2;
+        }
+
+        char s[INET6_ADDRSTRLEN];
+        inet_ntop(p->ai_family, get_in_addr((struct sockaddr *)p->ai_addr),
+                        s, sizeof s);
+        printf("client: connecting to %s\n", s);
+
+        freeaddrinfo(servinfo); // all done with this structure
+
+        const int MAX_RECV_SIZE = 1024;
+        char recv_buf[MAX_RECV_SIZE];
+        int numbytes;
 
         const int BUF_SIZE = 1024;
         char *buf = malloc(BUF_SIZE);
 
         while(1) {
-                print_prompt();
+                // Receive from server
+                if ((numbytes = recv(sockfd, recv_buf, MAX_RECV_SIZE-1, 0)) == -1) {
+                        perror("recv");
+                        exit(1);
+                }
 
+                recv_buf[numbytes] = '\0';
+                printf("client: received '%s'\n", recv_buf);
+
+                // Send input to server
+                print_prompt();
                 if (_getline(buf, BUF_SIZE) == -1)
                         printf("Command too long, cannot be more than %d chars\n", BUF_SIZE);
 
                 send_to_server(buf);
         }
 
+        close(sockfd);
         return 0;
 }
 
 void send_to_server(char *msg) {
+        printf("In an ideal world, I would send the following message to the "
+                        "server: %s\n", msg);
 }
