@@ -9,17 +9,12 @@
 #include "util.h"
 #include "client.h"
 
-// get sockaddr, IPv4 or IPv6:
-void *get_in_addr(struct sockaddr *sa) {
-        if (sa->sa_family == AF_INET) {
-                return &(((struct sockaddr_in*)sa)->sin_addr);
-        }
+//PORT defined in util.h
 
-        return &(((struct sockaddr_in6*)sa)->sin6_addr);
-}
+#define OLD_IP "107.170.106.89"
+#define LOCALHOST "127.0.0.1"
 
 int start_client() {
-        const char *PORT = "10000";
 
         printf("Starting client\n");
 
@@ -29,7 +24,7 @@ int start_client() {
         memset(&hints, 0, sizeof(hints));
 
         // Open connection to server here
-        int rv = getaddrinfo("107.170.106.89", PORT, &hints, &servinfo);
+        int rv = getaddrinfo(LOCALHOST, PORT, &hints, &servinfo);
         if (rv != 0) {
                 fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
                 return 1;
@@ -88,14 +83,18 @@ int start_client() {
                 if (_getline(buf, BUF_SIZE) == -1)
                         printf("Command too long, cannot be more than %d chars\n", BUF_SIZE);
 
-                send_to_server(buf);
+                send_to_server(buf, sockfd);
         }
 
         close(sockfd);
         return 0;
 }
 
-void send_to_server(char *msg) {
-        printf("In an ideal world, I would send the following message to the "
+void send_to_server(char *msg, int sockfd) {
+        printf("Sending the following message to the "
                         "server: %s\n", msg);
+
+	if(send(sockfd, msg, strlen(msg), 0))
+		perror("send");
+	
 }
