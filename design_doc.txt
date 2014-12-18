@@ -1,0 +1,42 @@
+===============
+UI
+
+client v1: 
+	Client asks user for a name to connect as
+	Connects to server	
+	Any text entered gets sent to server
+	Prints any text received from server
+
+server v1:
+	...
+
+v???:
+	???
+
+===============
+Protocol
+
+
+===============
+Files and roles
+
+chat.c: 
+	asks whether to start client or server, then starts the appropriate one
+
+server.c: 
+	starts listening, waits for connections, accepts it when it gets it, 
+	sends 'Hello World', recvs a response, closes everything and exits
+
+client.c:
+	connects on localhost, alternates btw sending and receiving
+
+util.c:
+	has some terminal io functions
+	shared info like the port used
+
+
+Files goals:
+	Put, either into util.c or something like socket_stuff.c, all the socket-related
+	code.
+
+	???
